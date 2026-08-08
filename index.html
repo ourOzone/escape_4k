@@ -13,16 +13,21 @@
   #intro{position:fixed;inset:0;z-index:30;user-select:none;cursor:default;}
   #intro .layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;transition:opacity 0.4s ease;}
   #intro .layer.hidden{opacity:0;}
+  #introLines{
+    clip-path:circle(0px at 50% 50%);
+    -webkit-clip-path:circle(0px at 50% 50%);
+    will-change:clip-path;
+  }
   #intro .hotspot{
     position:absolute;transform:translate(-50%,-50%);
     width:44px;height:44px;border-radius:50%;
-    cursor:pointer;background:transparent;
+    cursor:default;background:transparent;
     will-change:left,top;
   }
   #intro.hidden{opacity:0;pointer-events:none;transition:opacity 0.5s ease;}
   #intro.satellite .hotspot{display:none;}
   #intro.satellite #introDefault,
-  #intro.satellite #introHover{opacity:0;}
+  #intro.satellite #introLines{opacity:0;}
   #intro.satellite #introSatellite{opacity:1;}
 
   #modeToggle{
@@ -43,10 +48,10 @@
 
   #greenFlash{
     position:fixed;inset:0;z-index:35;background:#00FF00;
-    opacity:0;pointer-events:none;transition:opacity 1.0s ease;
+    opacity:0;pointer-events:none;transition:opacity 0.6s ease;
   }
   #greenFlash.show{opacity:1;}
-  #greenFlash.fadeout{transition:opacity 2.0s ease;}
+  #greenFlash.fadeout{transition:opacity 1.2s ease;}
 
   #backBtn{
     position:fixed;top:16px;left:16px;z-index:15;
@@ -65,8 +70,8 @@
   <div id="loading">불러오는 중…</div>
 
   <div id="intro">
-    <img class="layer" id="introDefault" src="img/인트로/디폴트_1.png" alt="">
-    <img class="layer hidden" id="introHover" src="img/인트로/디폴트_2.png" alt="">
+    <img class="layer" id="introDefault" src="img/인트로/디폴트.png" alt="">
+    <img class="layer" id="introLines" src="img/인트로/디폴트_선.png" alt="">
     <img class="layer hidden" id="introSatellite" src="img/인트로/위성_1.jpeg" alt="">
   </div>
 
@@ -87,17 +92,18 @@ const CYCLE_DEGREES = HOLD_DEGREES + TRANSITION_DEGREES;
 
 // 인트로 이미지 위 흰 점 위치 (이미지 크기 대비 %). 실제 점 위치에 맞게 조정하세요.
 const HOTSPOTS = [
-  { country: '한국', xPct: 55.28, yPct: 40.64 },
-  { country: '일본', xPct: 63.15, yPct: 47.05 },
-  { country: '홍콩', xPct: 49.97, yPct: 64.16 },
-  { country: '인도', xPct: 33.64, yPct: 65.69 }
+  { country: '한국', xPct: 55.28, yPct: 39.87 },
+  { country: '일본', xPct: 62.83, yPct: 46.01 },
+  { country: '홍콩', xPct: 50.1, yPct: 62.01 },
+  { country: '인도', xPct: 34.65, yPct: 63.8 }
 ];
+const INTRO_CENTER = { xPct: 44.16, yPct: 50.84 };
 
 const container = document.getElementById('view');
 const loading = document.getElementById('loading');
 const intro = document.getElementById('intro');
 const introDefault = document.getElementById('introDefault');
-const introHover = document.getElementById('introHover');
+const introLines = document.getElementById('introLines');
 const greenFlash = document.getElementById('greenFlash');
 const backBtn = document.getElementById('backBtn');
 
@@ -132,11 +138,20 @@ function buildHotspots(){
     const hasImages = info && info.sequence && info.sequence.length > 0;
     const el = document.createElement('div');
     el.className = 'hotspot';
-    el.addEventListener('mouseenter', () => introHover.classList.remove('hidden'));
-    el.addEventListener('mouseleave', () => introHover.classList.add('hidden'));
-    el.addEventListener('click', () => {
-      if (!hasImages) return;
-      selectCountry(spot.country);
+    el.addEventListener('mouseenter', () => {
+      if (spot._px) {
+        introCenterPx = { x: spot._px.x, y: spot._px.y };
+        introMaxRadius = spot._px.maxR;
+        introLines.style.transform = `translate(${spot._px.dx}px, ${spot._px.dy}px)`;
+      }
+      hoveredSpot = hasImages ? spot : null;
+      revealed = true;
+      startClipAnim();
+    });
+    el.addEventListener('mouseleave', () => {
+      hoveredSpot = null;
+      revealed = false;
+      startClipAnim();
     });
     intro.appendChild(el);
     hotspotEls.push({ el, spot });
@@ -144,7 +159,10 @@ function buildHotspots(){
   positionHotspots();
 }
 
-// object-fit:cover 로 표시되는 이미지의 실제 그려진 영역을 계산해서 hotspot 배치
+// object-fit:cover 로 표시되는 이미지의 실제 그려진 영역을 계산해서 hotspot / clip-path 중심 배치
+let introCenterPx = { x: 0, y: 0 };
+let introNaturalCenter = { x: 0, y: 0 };
+let introMaxRadius = 0;
 function positionHotspots(){
   const iw = introDefault.naturalWidth, ih = introDefault.naturalHeight;
   if (!iw || !ih) return;
@@ -153,12 +171,84 @@ function positionHotspots(){
   const drawnW = iw*scale, drawnH = ih*scale;
   const offsetX = (vw - drawnW)/2;
   const offsetY = (vh - drawnH)/2;
+  // 선 이미지의 원본 중심(INTRO_CENTER)이 object-fit:cover에서 놓이는 뷰포트 좌표 (element-local과 동일, 요소가 inset:0 이므로)
+  const linesNaturalCx = offsetX + drawnW * INTRO_CENTER.xPct/100;
+  const linesNaturalCy = offsetY + drawnH * INTRO_CENTER.yPct/100;
+  introNaturalCenter = { x: linesNaturalCx, y: linesNaturalCy };
   hotspotEls.forEach(({el, spot}) => {
     const px = offsetX + drawnW * spot.xPct/100;
     const py = offsetY + drawnH * spot.yPct/100;
     el.style.left = px + 'px';
     el.style.top = py + 'px';
+    // 각 hotspot을 중심으로 삼을 때의 최대 반경(모서리까지 거리) 캐시
+    // + 선 이미지를 이 도시 위치로 옮기기 위한 translate 오프셋 계산
+    spot._px = {
+      x: px, y: py,
+      dx: px - linesNaturalCx,
+      dy: py - linesNaturalCy,
+      maxR: Math.max(
+        Math.hypot(px, py),
+        Math.hypot(vw - px, py),
+        Math.hypot(px, vh - py),
+        Math.hypot(vw - px, vh - py)
+      )
+    };
   });
+  applyIntroClip();
+}
+
+let revealed = false;
+let currentRadius = 0;
+let clipAnimId = null;
+let hoveredSpot = null;
+const CLIP_DURATION = 300; // ms
+
+function setClip(r){
+  // 이미지가 translate 되어 있으므로 clip-path는 element-local의 원본 중심에 고정
+  const s = `circle(${r}px at ${introNaturalCenter.x}px ${introNaturalCenter.y}px)`;
+  introLines.style.clipPath = s;
+  introLines.style.webkitClipPath = s;
+}
+
+function startClipAnim(){
+  if (clipAnimId) cancelAnimationFrame(clipAnimId);
+  if (!revealed) {
+    // 뗄 때: 즉시 사라짐
+    currentRadius = 0;
+    setClip(0);
+    clipAnimId = null;
+    return;
+  }
+  const from = currentRadius;
+  const to = introMaxRadius;
+  if (from === to) return;
+  const start = performance.now();
+  const dur = CLIP_DURATION * (Math.abs(to - from) / Math.max(introMaxRadius, 1));
+  function step(now){
+    const t = Math.min(1, (now - start) / Math.max(dur, 1));
+    const eased = t * t * t; // easeInCubic — 느렸다 빨라짐
+    currentRadius = from + (to - from) * eased;
+    setClip(currentRadius);
+    if (t < 1) {
+      clipAnimId = requestAnimationFrame(step);
+    } else {
+      clipAnimId = null;
+      // 방사가 완전히 끝났고, 여전히 호버 중이면 포토스피어로 진입
+      if (revealed && hoveredSpot) {
+        const target = hoveredSpot;
+        hoveredSpot = null;
+        selectCountry(target.country);
+      }
+    }
+  }
+  clipAnimId = requestAnimationFrame(step);
+}
+
+function applyIntroClip(){
+  // 초기/리셋용 — 애니메이션 없이 즉시 반영
+  if (clipAnimId) { cancelAnimationFrame(clipAnimId); clipAnimId = null; }
+  currentRadius = revealed ? introMaxRadius : 0;
+  setClip(currentRadius);
 }
 introDefault.addEventListener('load', positionHotspots);
 addEventListener('resize', positionHotspots);
@@ -179,7 +269,7 @@ function selectCountry(name){
       greenFlash.classList.add('fadeout');
       greenFlash.classList.remove('show');
     });
-  }, 1100);
+  }, 700);
 }
 
 function initPhotosphere(urls, onReady){
@@ -301,7 +391,8 @@ function animate(){
 backBtn.addEventListener('click', () => {
   backBtn.classList.remove('show');
   intro.classList.remove('hidden');
-  introHover.classList.add('hidden');
+  revealed = false;
+  applyIntroClip();
   document.getElementById('modeToggle').classList.remove('hidden');
 });
 
@@ -313,7 +404,8 @@ document.querySelectorAll('#modeToggle button').forEach(btn => {
       intro.classList.add('satellite');
     } else {
       intro.classList.remove('satellite');
-      introHover.classList.add('hidden');
+      revealed = false;
+      applyIntroClip();
     }
   });
 });

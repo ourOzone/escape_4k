@@ -29,7 +29,9 @@
     position:fixed;top:36px;left:40px;z-index:32;
     display:flex;flex-direction:column;gap:28px;
     font-family:Arial,sans-serif;font-weight:400;
+    transition:opacity 0.4s ease;
   }
+  #modeToggle.hidden{opacity:0;pointer-events:none;}
   #modeToggle button{
     background:transparent;color:#fff;border:none;padding:0;
     font-size:40px;line-height:1;cursor:pointer;text-align:left;
@@ -168,6 +170,7 @@ function selectCountry(name){
 
   greenFlash.classList.remove('fadeout');
   greenFlash.classList.add('show');
+  document.getElementById('modeToggle').classList.add('hidden');
   setTimeout(() => {
     intro.classList.add('hidden');
     loading.style.display = 'flex';
@@ -299,6 +302,7 @@ backBtn.addEventListener('click', () => {
   backBtn.classList.remove('show');
   intro.classList.remove('hidden');
   introHover.classList.add('hidden');
+  document.getElementById('modeToggle').classList.remove('hidden');
 });
 
 document.querySelectorAll('#modeToggle button').forEach(btn => {

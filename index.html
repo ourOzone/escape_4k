@@ -27,8 +27,83 @@
   #intro.hidden{opacity:0;pointer-events:none;transition:opacity 0.5s ease;}
   #intro.satellite .hotspot{display:none;}
   #intro.satellite #introDefault,
-  #intro.satellite #introLines{opacity:0;}
-  #intro.satellite #introSatellite{opacity:1;}
+  #intro.satellite #introLines,
+  #intro.satellite #introSatellite{opacity:0;}
+  #intro.satellite #satelliteFrame{opacity:1;pointer-events:auto;}
+
+  /* ===== Satellite frame (Figma Frame 2) ===== */
+  #satelliteFrame{
+    position:absolute;inset:0;z-index:1;
+    display:flex;align-items:center;justify-content:center;
+    background:#ffffff;
+    opacity:0;pointer-events:none;
+    transition:opacity 0.4s ease;
+  }
+  #satelliteFrame .sf-stage{
+    position:relative;width:1920px;height:1080px;background:#ffffff;
+    transform-origin:center center;flex:none;
+  }
+  #satelliteFrame .sf-layer{position:absolute;}
+  #satelliteFrame .sf-layer img{
+    width:100%;height:100%;display:block;object-fit:cover;
+    pointer-events:none;user-select:none;-webkit-user-drag:none;
+    transform-origin:center center;
+    transition:transform 0.35s cubic-bezier(0.2,0.9,0.3,1.25);
+  }
+  #satelliteFrame .sf-layer.clickable{cursor:pointer;}
+  #satelliteFrame .sf-layer.clickable:hover{z-index:100;}
+  /* hover 판정은 원본 크기 기준으로 유지하고 이미지만 시각적으로 커진다.
+     .sf-layer 는 원래 크기 그대로, img/.rot 만 transform 으로 확대. */
+  #satelliteFrame .sf-layer.clickable:hover img{transform:scale(1.18);}
+  /* 회전이 있는 두 조각은 .rot 에 회전+스케일을 함께 적용 */
+  #satelliteFrame .sf-br9 .rot,
+  #satelliteFrame .sf-br1 .rot{
+    transition:transform 0.35s cubic-bezier(0.2,0.9,0.3,1.25);
+  }
+  #satelliteFrame .sf-br9 .rot{transform:rotate(-55.72deg);}
+  #satelliteFrame .sf-br1 .rot{transform:rotate(-52.07deg);}
+  #satelliteFrame .sf-br9.clickable:hover .rot{transform:rotate(-55.72deg) scale(1.18);}
+  #satelliteFrame .sf-br1.clickable:hover .rot{transform:rotate(-52.07deg) scale(1.18);}
+  #satelliteFrame .sf-br9.clickable:hover img,
+  #satelliteFrame .sf-br1.clickable:hover img{transform:none;}
+  #satelliteFrame .sf-earth2   { left:561px; top:205px;  width:798px;  height:798px; }
+  #satelliteFrame .sf-satellite{ left:0;     top:64px;   width:1920px; height:1080px; opacity:0.2; }
+  #satelliteFrame .sf-bl6      { left:95px;  top:844px;  width:484px;  height:375px; }
+  #satelliteFrame .sf-bl5      { left:266px; top:746px;  width:407px;  height:301px; }
+  #satelliteFrame .sf-bl2      { left:445px; top:582px;  width:455px;  height:426px; }
+  #satelliteFrame .sf-tl7      { left:492px; top:325px;  width:80px;   height:294px; }
+  #satelliteFrame .sf-br9      { left:914px; top:537.9791px; width:349.7194px; height:500.6812px;
+                                 display:flex;align-items:center;justify-content:center; }
+  #satelliteFrame .sf-br9 .rot { transform:rotate(-55.72deg); width:593px; height:19px; }
+  #satelliteFrame .sf-tr8      { left:1193px; top:108px; width:50px;   height:30px;  }
+  #satelliteFrame .sf-bl4      { left:429px;  top:570px; width:212px;  height:190px; }
+  #satelliteFrame .sf-bl3      { left:415px;  top:492px; width:202px;  height:180px; }
+  #satelliteFrame .sf-tr3      { left:1111px; top:157px; width:256px;  height:277px; }
+  #satelliteFrame .sf-br8      { left:1385px; top:398px; width:47px;   height:370px; }
+  #satelliteFrame .sf-tr5      { left:1192px; top:216px; width:320px;  height:225px; }
+  #satelliteFrame .sf-tr6      { left:1268px; top:370px; width:244px;  height:128px; }
+  #satelliteFrame .sf-tr7      { left:1053px; top:402px; width:319px;  height:242px; }
+  #satelliteFrame .sf-tr4      { left:1004px; top:88px;  width:157px;  height:219px; }
+  #satelliteFrame .sf-tr2      { left:1317px; top:232px; width:35px;   height:321px; }
+  #satelliteFrame .sf-tl1      { left:327px;  top:166px; width:416px;  height:343px; }
+  #satelliteFrame .sf-tl4      { left:640px;  top:148px; width:248px;  height:174px; }
+  #satelliteFrame .sf-tl5      { left:849px;  top:197px; width:262px;  height:77px;  }
+  #satelliteFrame .sf-tl3      { left:747px;  top:282px; width:118px;  height:91px;  }
+  #satelliteFrame .sf-tl2      { left:702px;  top:341px; width:181px;  height:175px; }
+  #satelliteFrame .sf-br10     { left:1176px; top:728px; width:526px;  height:307px; }
+  #satelliteFrame .sf-br7      { left:1127px; top:795px; width:253px;  height:236px; }
+  #satelliteFrame .sf-br3      { left:1153px; top:752px; width:321px;  height:302px; }
+  #satelliteFrame .sf-br4      { left:1053px; top:864px; width:64px;   height:79px;  }
+  #satelliteFrame .sf-br6      { left:1277px; top:715px; width:255px;  height:172px; }
+  #satelliteFrame .sf-br5      { left:1103px; top:826px; width:71px;   height:64px;  }
+  #satelliteFrame .sf-br2      { left:1106px; top:720px; width:155px;  height:133px; }
+  #satelliteFrame .sf-earth4   { left:761px;  top:384px; width:397px;  height:397px; }
+  #satelliteFrame .sf-br1      { left:1347px; top:717.3384px; width:187.6842px; height:158.9722px;
+                                 display:flex;align-items:center;justify-content:center; }
+  #satelliteFrame .sf-br1 .rot { transform:rotate(-52.07deg); width:41px; height:206px; }
+  #satelliteFrame .sf-tl6      { left:641px;  top:440px; width:165px;  height:112px; }
+  #satelliteFrame .sf-bl1      { left:665px;  top:638px; width:295px;  height:114px; }
+  #satelliteFrame .sf-tr1      { left:1031px; top:357px; width:187px;  height:196px; }
 
   #modeToggle{
     position:fixed;top:36px;left:40px;z-index:32;
@@ -45,6 +120,7 @@
   }
   #modeToggle button:hover,
   #modeToggle button.active{opacity:1;}
+  #intro.satellite ~ #modeToggle button{color:#000;}
 
   #greenFlash{
     position:fixed;inset:0;z-index:35;background:#00FF00;
@@ -73,6 +149,45 @@
     <img class="layer" id="introDefault" src="img/인트로/디폴트.png" alt="">
     <img class="layer" id="introLines" src="img/인트로/디폴트_선.png" alt="">
     <img class="layer hidden" id="introSatellite" src="img/인트로/위성_1.jpeg" alt="">
+
+    <div id="satelliteFrame">
+      <div class="sf-stage" id="sfStage">
+        <div class="sf-layer sf-earth2"><img src="img/frame2/bg-earth2.png" alt=""></div>
+        <div class="sf-layer sf-satellite"><img src="img/frame2/satellite.png" alt=""></div>
+        <div class="sf-layer sf-bl6"><img src="img/frame2/bl6.png" alt=""></div>
+        <div class="sf-layer sf-bl5"><img src="img/frame2/bl5.png" alt=""></div>
+        <div class="sf-layer sf-bl2"><img src="img/frame2/bl2.png" alt=""></div>
+        <div class="sf-layer sf-tl7"><img src="img/frame2/tl7.png" alt=""></div>
+        <div class="sf-layer sf-br9"><div class="rot"><img src="img/frame2/br9.png" alt=""></div></div>
+        <div class="sf-layer sf-tr8"><img src="img/frame2/tr8.png" alt=""></div>
+        <div class="sf-layer sf-bl4"><img src="img/frame2/bl4.png" alt=""></div>
+        <div class="sf-layer sf-bl3"><img src="img/frame2/bl3.png" alt=""></div>
+        <div class="sf-layer sf-tr3"><img src="img/frame2/tr3.png" alt=""></div>
+        <div class="sf-layer sf-br8"><img src="img/frame2/br8.png" alt=""></div>
+        <div class="sf-layer sf-tr5"><img src="img/frame2/tr5.png" alt=""></div>
+        <div class="sf-layer sf-tr6"><img src="img/frame2/tr6.png" alt=""></div>
+        <div class="sf-layer sf-tr7"><img src="img/frame2/tr7.png" alt=""></div>
+        <div class="sf-layer sf-tr4"><img src="img/frame2/tr4.png" alt=""></div>
+        <div class="sf-layer sf-tr2"><img src="img/frame2/tr2.png" alt=""></div>
+        <div class="sf-layer sf-tl1"><img src="img/frame2/tl1.png" alt=""></div>
+        <div class="sf-layer sf-tl4"><img src="img/frame2/tl4.png" alt=""></div>
+        <div class="sf-layer sf-tl5"><img src="img/frame2/tl5.png" alt=""></div>
+        <div class="sf-layer sf-tl3"><img src="img/frame2/tl3.png" alt=""></div>
+        <div class="sf-layer sf-tl2"><img src="img/frame2/tl2.png" alt=""></div>
+        <div class="sf-layer sf-br10"><img src="img/frame2/br10.png" alt=""></div>
+        <div class="sf-layer sf-br7"><img src="img/frame2/br7.png" alt=""></div>
+        <div class="sf-layer sf-br3"><img src="img/frame2/br3.png" alt=""></div>
+        <div class="sf-layer sf-br4"><img src="img/frame2/br4.png" alt=""></div>
+        <div class="sf-layer sf-br6"><img src="img/frame2/br6.png" alt=""></div>
+        <div class="sf-layer sf-br5"><img src="img/frame2/br5.png" alt=""></div>
+        <div class="sf-layer sf-br2"><img src="img/frame2/br2.png" alt=""></div>
+        <div class="sf-layer sf-earth4"><img src="img/frame2/earth4.png" alt=""></div>
+        <div class="sf-layer sf-br1"><div class="rot"><img src="img/frame2/br1.png" alt=""></div></div>
+        <div class="sf-layer sf-tl6"><img src="img/frame2/tl6.png" alt=""></div>
+        <div class="sf-layer sf-bl1"><img src="img/frame2/bl1.png" alt=""></div>
+        <div class="sf-layer sf-tr1"><img src="img/frame2/tr1.png" alt=""></div>
+      </div>
+    </div>
   </div>
 
   <div id="modeToggle">
@@ -121,11 +236,30 @@ fetch('seqence.json')
     sequenceData = data;
     buildHotspots();
     if (introDefault.complete) loading.style.display = 'none';
+    preloadAllPhotospheres();
   })
   .catch(err => {
     loading.textContent = '데이터를 불러올 수 없습니다';
     console.error(err);
   });
+
+// 인트로가 뜬 뒤 백그라운드에서 모든 photosphere 이미지를 HTTP 캐시로 미리 받아둔다.
+// 브라우저 캐시에만 올려두는 방식이라 GPU 메모리는 사용하지 않고,
+// 나라 선택 후 THREE.TextureLoader가 요청할 때 네트워크 대기 없이 즉시 decode된다.
+function preloadAllPhotospheres(){
+  if (!sequenceData) return;
+  const urls = [];
+  for (const country in sequenceData) {
+    const info = sequenceData[country];
+    if (!info || !info.sequence) continue;
+    info.sequence.forEach(f => urls.push(`${info.folder}/${encodeURIComponent(f)}`));
+  }
+  urls.forEach(src => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  });
+}
 
 introDefault.addEventListener('load', () => {
   if (sequenceData) loading.style.display = 'none';
@@ -394,6 +528,28 @@ backBtn.addEventListener('click', () => {
   revealed = false;
   applyIntroClip();
   document.getElementById('modeToggle').classList.remove('hidden');
+});
+
+// Satellite frame (Figma Frame 2) — 1920x1080 스테이지를 뷰포트에 맞춰 스케일
+const sfStage = document.getElementById('sfStage');
+const SF_BASE_W = 1920, SF_BASE_H = 1080;
+function fitSatelliteFrame(){
+  const s = Math.min(innerWidth / SF_BASE_W, innerHeight / SF_BASE_H);
+  sfStage.style.transform = `scale(${s})`;
+}
+addEventListener('resize', fitSatelliteFrame);
+fitSatelliteFrame();
+
+// 4분면 → 나라 매핑
+// 좌상단(tl) 홍콩, 좌하단(bl) 한국, 우상단(tr) 일본, 우하단(br) 인도
+const SF_QUADRANT_COUNTRY = { tl: '홍콩', bl: '한국', tr: '일본', br: '인도' };
+document.querySelectorAll('#satelliteFrame .sf-layer').forEach(el => {
+  const key = [...el.classList].map(c => c.match(/^sf-(tl|bl|tr|br)\d+$/)).find(Boolean);
+  if (!key) return; // sf-earth2 / sf-satellite / sf-earth4 는 배경, 클릭 대상 아님
+  const country = SF_QUADRANT_COUNTRY[key[1]];
+  el.dataset.country = country;
+  el.classList.add('clickable');
+  el.addEventListener('click', () => selectCountry(country));
 });
 
 document.querySelectorAll('#modeToggle button').forEach(btn => {

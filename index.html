@@ -30,6 +30,8 @@
   #intro.satellite #introLines,
   #intro.satellite #introSatellite{opacity:0;}
   #intro.satellite #satelliteFrame{opacity:1;pointer-events:auto;}
+  /* intro 전체가 숨겨질 때(photosphere 진입 상태)는 satelliteFrame 도 확실히 이벤트를 놓아준다 */
+  #intro.hidden #satelliteFrame{pointer-events:none;}
 
   /* ===== Satellite frame (Figma Frame 2) ===== */
   #satelliteFrame{
